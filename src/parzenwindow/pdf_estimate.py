@@ -22,7 +22,7 @@ class ParzenWindow:
         
         """
         self.df = training_data_df
-        self.df_numpy = df.to_numpy()
+        self.df_numpy = training_data_df.to_numpy()
         
 
     def get_gaussian_kernel_fn(self):
@@ -96,53 +96,3 @@ class ParzenWindow:
 
         return sum_of_kernels_pdfs.sum()
 
-
-
-
-if __name__ == "__main__":
-    # Generate 1,000,000 random values for X
-    X = np.random.uniform(-10, 10, size=1_000_000)
-
-    # Generate Y based on a quadratic function of X, with some added noise
-    noise = np.random.normal(0, 2, size=1_000_000)
-    Y = 0.5 * X**2 - 3 * X + 5 + noise
-
-    # Create a Pandas DataFrame
-    df = pd.DataFrame({'X': X, 'Y': Y})
-    pw = ParzenWindow(df = df)
-
-
-    test_point = df.iloc[0,:].to_numpy()
-    print(f"Getting the pdf value of {test_point}")
-    print(pw.pdf(new_datapoint=test_point, hypercube_length= 0.8))
-
-    # Define the range for both x and y axes
-    x = np.linspace(-20, 20, 50)  # 100 points from -10 to 10
-    y = np.linspace(-20, 20, 50)  # 100 points from -10 to 10
-
-    # Create the meshgrid
-    X,Y = np.meshgrid(x, y)
-    # Stack the X and Y components into vectors for g
-    points = np.column_stack([X.ravel(), Y.ravel()])
-
-    Z = []
-    for point in points:
-        Z.append(pw.pdf(new_datapoint=point, hypercube_length= 0.8, kernel_selection="square"))
-        print(point)
-
-    Z = np.array(Z).reshape((50,50))
-    # Plotting the function g as a 3D surface
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection='3d')
-
-    # Plot the surface
-    ax.plot_surface(X, Y, Z, cmap='viridis')
-
-    # Add labels
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('g(X, Y)')
-    ax.set_title('3D Surface Plot of g(x, y) = sin(sqrt(x^2 + y^2))')
-
-    # Show the plot
-    plt.show()
